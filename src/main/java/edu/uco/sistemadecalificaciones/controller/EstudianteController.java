@@ -1,19 +1,29 @@
 
 package edu.uco.sistemadecalificaciones.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import edu.uco.sistemadecalificaciones.model.Estudiante;
+import edu.uco.sistemadecalificaciones.service.EstudianteService;
 
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 public class EstudianteController {
 
+    private final EstudianteService estudianteService;
+
+    public EstudianteController(EstudianteService estudianteService) {
+        this.estudianteService = estudianteService;
+    }
+
     @GetMapping("/estudiantes")
-    public List<String> listarEstudiantes() {
+    public List<Estudiante> listarEstudiantes() {
+        return estudianteService.listarEstudiantes();
+    }
 
-        return List.of("Daniel", "Carlos", "Mariana");
-
+    @PostMapping("/estudiantes")
+    public Estudiante registrarEstudiante(@RequestBody Estudiante estudiante) {
+        return estudianteService.registrarEstudiante(estudiante);
     }
 }
 
