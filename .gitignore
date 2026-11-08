@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Seguridad y archivos locales ###
+.env
+.env.*
+!.env.example
+
+### Archivos temporales ###
+*.log
