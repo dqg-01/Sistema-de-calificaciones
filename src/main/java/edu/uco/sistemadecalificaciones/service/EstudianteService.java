@@ -1,32 +1,41 @@
+
 package edu.uco.sistemadecalificaciones.service;
 
-import edu.uco.sistemadecalificaciones.model.Estudiante;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+
+import edu.uco.sistemadecalificaciones.model.Estudiante;
+import edu.uco.sistemadecalificaciones.repository.EstudianteRepository;
 
 @Service
 public class EstudianteService {
 
-    private final List<Estudiante> estudiantes = new ArrayList<>();
+    private final EstudianteRepository repositorio;
 
-    public EstudianteService() {
-        estudiantes.add(new Estudiante(
-            "2026001", "Daniel", "daniel@uco.edu.co"
-        ));
-
-        estudiantes.add(new Estudiante(
-            "2026002", "Carlos", "carlos@uco.edu.co"
-        ));
+    public EstudianteService(EstudianteRepository repositorio) {
+        this.repositorio = repositorio;
     }
 
     public List<Estudiante> listarEstudiantes() {
-        return estudiantes;
+        return repositorio.findAll();
     }
 
     public Estudiante registrarEstudiante(Estudiante estudiante) {
-        estudiantes.add(estudiante);
-        return estudiante;
+
+        if (estudiante.getCodigo() == null ||
+            estudiante.getCodigo().isBlank()) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "El codigo es obligatorio");
+        }
+
+        if (repositorio.existsById(estudiante.getCodigo())) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT, "El estudiante ya existe");
+        }
+
+        return repositorio.save(estudiante);
     }
 }
