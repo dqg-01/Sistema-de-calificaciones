@@ -1,4 +1,3 @@
-
 package edu.uco.sistemadecalificaciones.model;
 
 public class Estudiante {
