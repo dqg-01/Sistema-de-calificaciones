@@ -21,12 +21,13 @@ public class UsoCelularController {
 
     @PostMapping
     public UsoCelular registrar(
-            @Parameter(
-                description = "Número de la calificación a la que se aplicará el descuento",
-                example = "1")
-            @RequestParam Long calificacionId) {
+            @Parameter(description = "Código del estudiante", example = "2026003")
+            @RequestParam String codigoEstudiante,
 
-        return servicio.registrarUso(calificacionId);
+            @Parameter(description = "Código de la materia", example = "MUS101")
+            @RequestParam String codigoMateria) {
+
+        return servicio.registrarUso(codigoEstudiante, codigoMateria);
     }
 
     @GetMapping
@@ -36,9 +37,7 @@ public class UsoCelularController {
 
     @GetMapping("/nota-final/{calificacionId}")
     public double consultarNotaFinal(
-            @Parameter(
-                description = "Número de la calificación que deseas consultar",
-                example = "1")
+            @Parameter(description = "Número de la calificación", example = "1")
             @PathVariable Long calificacionId) {
 
         return servicio.calcularNotaFinal(calificacionId);

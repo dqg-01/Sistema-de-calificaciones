@@ -22,20 +22,33 @@ public class UsoCelularService {
     public UsoCelularService(
             UsoCelularRepository usoCelularRepository,
             CalificacionRepository calificacionRepository) {
+
         this.usoCelularRepository = usoCelularRepository;
         this.calificacionRepository = calificacionRepository;
     }
 
-    public UsoCelular registrarUso(Long calificacionId) {
+    public UsoCelular registrarUso(
+            String codigoEstudiante,
+            String codigoMateria) {
 
-        Calificacion calificacion = calificacionRepository
-                .findById(calificacionId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Calificacion no encontrada"));
+        List<Calificacion> calificaciones = calificacionRepository
+            .findByEstudianteCodigoAndMateriaCodigo(
+                codigoEstudiante, codigoMateria);
+
+        if (calificaciones.isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "No existe una calificacion para ese estudiante y materia");
+        }
+
+        if (calificaciones.size() > 1) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Hay varias calificaciones para este estudiante y materia");
+        }
 
         UsoCelular uso = new UsoCelular();
-        uso.setCalificacion(calificacion);
+        uso.setCalificacion(calificaciones.get(0));
         uso.setFechaHora(LocalDateTime.now());
 
         return usoCelularRepository.save(uso);
@@ -48,13 +61,13 @@ public class UsoCelularService {
     public double calcularNotaFinal(Long calificacionId) {
 
         Calificacion calificacion = calificacionRepository
-                .findById(calificacionId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Calificacion no encontrada"));
+            .findById(calificacionId)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Calificacion no encontrada"));
 
         long incidentes = usoCelularRepository
-                .countByCalificacionId(calificacionId);
+            .countByCalificacionId(calificacionId);
 
         double notaFinal = calificacion.getNotaOriginal()
                 - (incidentes * 0.1);
@@ -62,3 +75,4 @@ public class UsoCelularService {
         return Math.max(0, Math.round(notaFinal * 10) / 10.0);
     }
 }
+
